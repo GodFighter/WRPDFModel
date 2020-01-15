@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'WRPDFModel_Example' do
+  pod 'WRPDFModel', :path => '../'
+
+  target 'WRPDFModel_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
