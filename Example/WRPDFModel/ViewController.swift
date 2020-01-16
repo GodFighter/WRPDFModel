@@ -7,12 +7,19 @@
 //
 
 import UIKit
+import WRPDFModel
 
 class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        let path = Bundle.main.path(forResource: "投资的常识", ofType: "pdf")
+        
+        let mModel = WRPDFModel(path!)
+        
+//        print("\(outlines)")
+
     }
 
     override func didReceiveMemoryWarning() {
