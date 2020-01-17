@@ -8,10 +8,24 @@
 import UIKit
 
 //MARK:-
-class WROutline: NSObject {
+public class WROutline: NSObject {
     var title = ""
     var page = 0
     var subOutline = Array<WROutline>()
+    
+    public override init() {
+        
+    }
+    
+    public init(_ info: NSDictionary) {
+        self.title = info["Title"] as? String ?? ""
+        self.page = info["Destination"] as? Int ?? 0
+        if let subInfos = info["Children"] as? Array<NSDictionary> {
+            self.subOutline = subInfos.map({ (info) -> WROutline in
+                return WROutline.init(info)
+            })
+        }
+    }
 }
 
 //MARK:-
@@ -23,15 +37,15 @@ class WRPDFNode {
     var children = Array<WRPDFNode>()
     
     
-    fileprivate var privateOutlines = Array<WROutline>()
+    fileprivate var privateOutlines: Array<WROutline>?
     var outlines: Array<WROutline> {
         get {
-            if self.privateOutlines.count == 0 {
+            if self.privateOutlines == nil {
                 if let outlineNode = self.child(for: "Outlines") {
                     self.privateOutlines = self.outlines(from: outlineNode)
                 }
             }
-            return self.privateOutlines
+            return self.privateOutlines!
         }
     }
     
@@ -106,7 +120,7 @@ class WRPDFNode {
         }
     }
     
-    func child() {
+    internal func child() {
         if self.children.count > 0 {
             return
         }
@@ -116,20 +130,7 @@ class WRPDFNode {
             guard let object = self.object else {
                 return
             }
-            var emptyArray : CGPDFArrayRef?
-            CGPDFObjectGetValue(object, .array, &emptyArray)
-            guard let array = emptyArray else {
-                return
-            }
-            let count = CGPDFArrayGetCount(array)
-            for i in 0..<count {
-                var obj : CGPDFObjectRef? = nil
-                CGPDFArrayGetObject(array, i, &obj)
-                if obj != nil {
-                    let node = WRPDFNode(object: obj!, name: "\(i)")
-                    self.children.append(node)
-                }
-            }
+            self.children = parseArray(object)
             
             break
             
@@ -145,20 +146,8 @@ class WRPDFNode {
             guard let dictionary = dict else {
                 return
             }
-
-//                let count = CGPDFDictionaryGetCount(dictionary)
             
-            CGPDFDictionaryApplyFunction(dictionary, { (key, object, info) in
-                guard let node = parsePDFK(key: key, object: object) else {
-                    return
-                }
-                nodes.append(node)
-            }, nil)
-            self.children = nodes
-            nodes.removeAll()
-            break
-        case .stream:
-            
+            self.children = parseDictionary(dictionary)
             break
         default:
             return
@@ -245,12 +234,9 @@ class WRPDFNode {
     
 
     fileprivate func index(_ pages : Array<WRPDFNode>, object: CGPDFObjectRef) -> Int {
-        return pages.firstIndex { (node) -> Bool in
-            if node.object == object {
-                print("\(node.name)")
-            }
+        return 1 + (pages.firstIndex { (node) -> Bool in
             return node.object == object
-            } ?? 1
+            } ?? 1)
     }
     
 }
