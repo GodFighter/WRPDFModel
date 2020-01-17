@@ -13,7 +13,7 @@ class WRPDFPageViewController: UIViewController {
 
     var scrollView: WRPDFScrollView!
     
-    var pageNumber: Int = 10
+    var pageNumber: Int = 18
     var myScale: CGFloat = 0
 
     var pdf: CGPDFDocument!
@@ -22,7 +22,7 @@ class WRPDFPageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let url = Bundle.main.url(forResource: "投资的常识", withExtension: "pdf")
+        let url = Bundle.main.url(forResource: "投资的常识1", withExtension: "pdf")
         let model = WRPDFModel(url!)
 
         self.pdf = model.document
