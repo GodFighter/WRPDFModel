@@ -63,6 +63,19 @@ func parseInfo(_ info: CGPDFDictionaryRef) -> Dictionary<String, Any> {
     return pdfInfoDictionary
 }
 
+func parsePage(_ pageInfo: CGPDFDictionaryRef) {
+    CGPDFDictionaryApplyFunction(pageInfo, { (key, object, info) in
+        let keyString = String(cString: UnsafePointer<CChar>(key), encoding: .isoLatin1)
+        if keyString == "Resources" {
+            var dict : CGPDFDictionaryRef? = nil
+
+            CGPDFObjectGetValue(object, .dictionary, &dict)
+            parsePage(dict!)
+        }
+        
+    }, nil)
+}
+
 func parseArray(_ object: CGPDFObjectRef) -> [WRPDFNode] {
     nodes = [WRPDFNode]()
 

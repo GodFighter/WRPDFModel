@@ -11,24 +11,32 @@ public class WRPDFModel {
 
     public init(_ url : URL) {
         self.url = url
+        
+        self.document = CGPDFDocument(self.url as CFURL)
+        
+//        let page = self.document?.page(at: 30)
+//        if let dic = page?.dictionary {
+//            parsePage(dic)
+//        }
     }
         
     fileprivate var url : URL
-    fileprivate var document : CGPDFDocument?
     
     fileprivate var pdfOutlines : [WROutline]?
     fileprivate var pdfPages : [CGPDFObjectRef]?
     
     fileprivate var infos : Dictionary<String, Any>?
     
+    public var document : CGPDFDocument?
+
 }
 
 //MARK:-
 fileprivate typealias WRPDFModel_Public = WRPDFModel
 public extension WRPDFModel_Public {
     var pagesCount : Int {
-        let myDocument = CGPDFDocument(self.url as CFURL)
-        guard let document = myDocument else {
+
+        guard let document = self.document else {
             return 0
         }
         return document.numberOfPages
@@ -38,8 +46,8 @@ public extension WRPDFModel_Public {
         get {
             if self.pdfOutlines == nil {
                 self.pdfOutlines = []
-                let myDocument = CGPDFDocument(self.url as CFURL)
-                guard let document = myDocument else {
+
+                guard let document = self.document else {
                     return []
                 }
                       
@@ -67,8 +75,8 @@ public extension WRPDFModel_Public {
     var pages: [CGPDFObjectRef] {
         get {
             if self.pdfPages == nil {
-                let myDocument = CGPDFDocument(self.url as CFURL)
-                guard let document = myDocument else {
+
+                guard let document = self.document else {
                     return []
                 }
                 guard let catalog = document.catalog else {
@@ -90,9 +98,9 @@ public extension WRPDFModel_Public {
     
     var info : Dictionary<String, Any> {
         if self.infos == nil {
-            let myDocument = CGPDFDocument(self.url as CFURL)
+
             self.infos = [:]
-            guard let document = myDocument else {
+            guard let document = self.document else {
                 return self.infos!
             }
             if let pdfInfo = document.info {

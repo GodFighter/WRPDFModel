@@ -13,6 +13,9 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		BBA2294C23CEF02A00C440F4 /* 投资的常识.pdf in Resources */ = {isa = PBXBuildFile; fileRef = BBA2294B23CEF02A00C440F4 /* 投资的常识.pdf */; };
+		BBB98E8A23D1608A00C58427 /* WRPDFView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB98E8923D1608A00C58427 /* WRPDFView.swift */; };
+		BBB98E8E23D1A61700C58427 /* WRPDFScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB98E8D23D1A61700C58427 /* WRPDFScrollView.swift */; };
+		BBB98E9023D1A86500C58427 /* WRPDFPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB98E8F23D1A86500C58427 /* WRPDFPageViewController.swift */; };
 		E62CDC62346375778FE6F52A /* Pods_WRPDFModel_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13A86E6FC1ABF3A6952C69A5 /* Pods_WRPDFModel_Example.framework */; };
 /* End PBXBuildFile section */
 
@@ -31,6 +34,9 @@
 		7C163623D5EFA5092B7A79F3 /* WRPDFModel.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = WRPDFModel.podspec; path = ../WRPDFModel.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		B83E974A3CBEAE283B44AD29 /* Pods-WRPDFModel_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WRPDFModel_Tests.debug.xcconfig"; path = "Target Support Files/Pods-WRPDFModel_Tests/Pods-WRPDFModel_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		BBA2294B23CEF02A00C440F4 /* 投资的常识.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "投资的常识.pdf"; sourceTree = "<group>"; };
+		BBB98E8923D1608A00C58427 /* WRPDFView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WRPDFView.swift; sourceTree = "<group>"; };
+		BBB98E8D23D1A61700C58427 /* WRPDFScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WRPDFScrollView.swift; sourceTree = "<group>"; };
+		BBB98E8F23D1A86500C58427 /* WRPDFPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WRPDFPageViewController.swift; sourceTree = "<group>"; };
 		BF049ED17933EA7F3D8FD44B /* Pods_WRPDFModel_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_WRPDFModel_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2742AAB8ED48A2EA333B100 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		D7FB321B303339A2321C2151 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
@@ -96,6 +102,9 @@
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
+				BBB98E8923D1608A00C58427 /* WRPDFView.swift */,
+				BBB98E8D23D1A61700C58427 /* WRPDFScrollView.swift */,
+				BBB98E8F23D1A86500C58427 /* WRPDFPageViewController.swift */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
 			);
 			name = "Example for WRPDFModel";
@@ -247,6 +256,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
+				BBB98E8E23D1A61700C58427 /* WRPDFScrollView.swift in Sources */,
+				BBB98E8A23D1608A00C58427 /* WRPDFView.swift in Sources */,
+				BBB98E9023D1A86500C58427 /* WRPDFPageViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
