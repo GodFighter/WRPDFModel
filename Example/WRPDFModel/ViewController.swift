@@ -73,9 +73,14 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        let pdfController = WRPDFPageViewController.init()
+        let url = Bundle.main.url(forResource: "投资的常识1", withExtension: "pdf")
+        let pdfController = WRPDFViewController.init(url!)
         pdfController.modalPresentationStyle = .fullScreen
         self.present(pdfController, animated: true, completion: nil)
+        
+//        let pdfController = WRPDFPageViewController.init()
+//        pdfController.modalPresentationStyle = .fullScreen
+//        self.present(pdfController, animated: true, completion: nil)
     }
 
     override func didReceiveMemoryWarning() {

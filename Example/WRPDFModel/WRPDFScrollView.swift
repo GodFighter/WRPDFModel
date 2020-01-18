@@ -16,6 +16,8 @@ class WRPDFScrollView: UIScrollView, UIScrollViewDelegate {
     var oldTiledPDFView: WRPDFView!
     var PDFScale = CGFloat()
     var tiledPDFPage: CGPDFPage!
+    
+    var minRect : CGRect = .zero
 
     func initialize() {
         decelerationRate = UIScrollView.DecelerationRate.fast
@@ -86,6 +88,9 @@ class WRPDFScrollView: UIScrollView, UIScrollViewDelegate {
          If this step were omitted, the content scale factor would be 2.0 on high resolution screens, which would cause the CATiledLayer to ask for tiles of the wrong scale.
          */
         tiledPDFView.contentScaleFactor = 1.0
+        if minRect.equalTo(.zero) {
+            minRect = frameToCenter
+        }
     }
     
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
@@ -96,14 +101,14 @@ class WRPDFScrollView: UIScrollView, UIScrollViewDelegate {
 
     func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?)
     {
+        
         // Remove back tiled view.
         oldTiledPDFView.removeFromSuperview()
 
         // Set the current TiledPDFView to be the old view.
         oldTiledPDFView = tiledPDFView
+        
     }
-
-
 
     /*
      A UIScrollView delegate callback, called when the user begins zooming.
@@ -113,8 +118,8 @@ class WRPDFScrollView: UIScrollView, UIScrollViewDelegate {
     {
         // Set the new scale factor for the TiledPDFView.
         PDFScale *= scale
-
-        replaceTiledPDFViewWithFrame(oldTiledPDFView.frame)
+        
+        replaceTiledPDFViewWithFrame(oldTiledPDFView.frame.width < self.bounds.width ? minRect : oldTiledPDFView.frame)
     }
 
 
