@@ -73,13 +73,20 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        WRPDFReaderConfig.shared.hasAnimated = false
+        WRPDFReaderConfig.shared.isDark = false
+
         let url = Bundle.main.url(forResource: "投资的常识1", withExtension: "pdf")
         let pdfController = WRPDFViewController.init(url!)
-        WRPDFReaderConfig.shared.hasAnimated = false
+
+        let backBarButtonItem = UIBarButtonItem(image: UIImage(named: "navigationBar_Back"), style: .plain, target: self, action: #selector(action_back(_:)))
+        pdfController.pageViewController.navigationItem.leftBarButtonItems = [backBarButtonItem]
+        
+        
         pdfController.modalPresentationStyle = .fullScreen
-        WRPDFReaderConfig.shared.isDark = true
-        WRPDFReaderConfig.shared.isTiled = false
         self.present(pdfController, animated: true, completion: nil)
+        
+        pdfController.setOutlinesItem(image: "navigationBar_Back")
 
 //        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
 //            WRPDFReaderConfig.shared.isDark = false
@@ -98,27 +105,8 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    fileprivate static func tintColor(_ image : UIImage, tintColor: UIColor) -> UIImage? {
-
-        UIGraphicsBeginImageContextWithOptions(image.size, false, image.scale)
+    @objc func action_back(_ sender: Any) {
         
-        let context = UIGraphicsGetCurrentContext()
-        context?.translateBy(x: 0, y: image.size.height)
-        context?.scaleBy(x: 1.0, y: -1.0)
-        context?.setBlendMode(CGBlendMode.normal)
-        
-        let rect = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height) as CGRect
-        if let cgImage = image.cgImage {
-            context?.clip(to: rect, mask:  cgImage)
-        }
-        
-        tintColor.setFill()
-        context?.fill(rect)
-        
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return newImage
     }
 
 }

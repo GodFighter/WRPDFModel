@@ -9,15 +9,13 @@
 import UIKit
 import WRPDFModel
 
-class WRPDFViewController: UIViewController {
+@objc open class WRPDFViewController: UIViewController {
     
     var pageViewController: UIPageViewController!
     
     var pdf: WRPDFModel!
     var url : URL!
     
-    fileprivate var tempNumber:NSInteger = 1
-
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -30,28 +28,17 @@ class WRPDFViewController: UIViewController {
         self.init(nibName: nil, bundle: nil)
         self.url = url
         self.pdf = WRPDFModel(url)
-}
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func viewDidLoad(){
-
-        super.viewDidLoad()
-    
-        let transitionStyle : UIPageViewController.TransitionStyle = WRPDFReaderConfig.shared.hasAnimated ? .pageCurl : .scroll
         
+        let transitionStyle : UIPageViewController.TransitionStyle = WRPDFReaderConfig.shared.hasAnimated ? .pageCurl : .scroll
         pageViewController = UIPageViewController(transitionStyle: transitionStyle, navigationOrientation: .horizontal, options: nil)
-        pageViewController.isDoubleSided = pageViewController.transitionStyle == .pageCurl
         pageViewController.delegate = self
         pageViewController.dataSource = self
-        
-        let navigationController = UINavigationController(rootViewController: pageViewController)
+        pageViewController.isDoubleSided = pageViewController.transitionStyle == .pageCurl
 
         let startViewController = self.viewControllerAt(0,isBack: false)
         let viewControllers = [startViewController]
         
+        let navigationController = UINavigationController(rootViewController: pageViewController)
         pageViewController.setViewControllers(viewControllers, direction: .forward, animated: false, completion: nil)
         
         self.addChild(navigationController)
@@ -63,16 +50,42 @@ class WRPDFViewController: UIViewController {
         
         pageViewController.view.backgroundColor = WRPDFReaderConfig.shared.backgroundColor
         NotificationCenter.default.addObserver(self, selector: #selector(action_dark(_:)), name: WRPDFReaderConfig.Notify.dark.name, object: nil)
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override public func viewDidLoad(){
+
+        super.viewDidLoad()
+        
+        var leftItems = [UIBarButtonItem]()
+        
+        let backBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .cancel, target: self, action: #selector(action_back(_:)))
+        leftItems.append(backBarButtonItem)
+        
+        pageViewController.navigationItem.leftBarButtonItems = leftItems
+        
+        pageViewController.navigationController?.navigationBar.setBackgroundImage(self.color((pageViewController.navigationController?.navigationBar.bounds.size)!, WRPDFReaderConfig.shared.navigationBarColor)
+            , for: .default)
+        // 纯色的图片，isTranslucent为no，会从y=64开始绘制
+        pageViewController.navigationController?.navigationBar.isTranslucent = true
+        pageViewController.navigationController?.navigationBar.tintColor = WRPDFReaderConfig.shared.navigationTintColor
+
+
+        if WRPDFReaderConfig.shared.showSearchItem {
+//            let searcj
+        }
 
     }
     
     func viewControllerAt(_ index: Int, isBack: Bool) -> UIViewController {
-        let controller = isBack ? WRPDFBackPageViewController() : WRPDFPageViewController()
-        if let viewController = controller as? WRPDFBackPageViewController {
-            viewController.pageNumber = index + 1
-        } else if let viewController = controller as? WRPDFPageViewController {
-//            viewController.page = self.pdf.document?.page(at: index + 1)
-            viewController.pageNumber = index + 1
+        let controller = isBack ? WRPDFBackPageViewController.init(index + 1) : WRPDFPageViewController.init(self.pdf, pageNumber: index + 1)
+        if let viewController = controller as? WRPDFPageViewController {
+            viewController.scrollView.tapBlock = { [weak self] in
+                self?.pageViewController?.navigationController?.setNavigationBarHidden(!(self?.pageViewController?.navigationController?.navigationBar.isHidden ?? true), animated: true)
+            }
         }
         return controller
     }
@@ -89,13 +102,64 @@ class WRPDFViewController: UIViewController {
             pageViewController.view.backgroundColor = WRPDFReaderConfig.shared.backgroundColor
         }
     }
+    
+    @objc func action_back(_ sender: Any) {
+        
+    }
+
+    fileprivate func color(_ size : CGSize, _ color : UIColor) -> UIImage? {
+        
+        UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
+        
+        guard let context = UIGraphicsGetCurrentContext() else{
+            return nil
+        }
+        
+        color.setFill()
+        context.fill(CGRect(x: 0, y: 0, width: size.width, height: size.height))
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return image
+    }
 
 }
+
+fileprivate typealias WRPDFViewController_Public = WRPDFViewController
+public extension WRPDFViewController_Public{
+    
+    @objc func setOutlinesItem(image: String? = nil, title: String? = nil) {
+        self.pdf.getOutlines { [weak self] (outlines) in
+            guard let strongSelf = self, outlines.count > 0 else {
+                return
+            }
+            var outlinesItem = UIBarButtonItem.init(barButtonSystemItem: .bookmarks, target: strongSelf, action:#selector(strongSelf.action_outlines))
+            if let barTitle = title {
+                outlinesItem = UIBarButtonItem.init(title: barTitle, style: .plain, target: strongSelf, action: #selector(strongSelf.action_outlines))
+            } else if let barImage = image, let imageObject = UIImage(named: barImage) {
+                outlinesItem = UIBarButtonItem.init(image: imageObject, style: .plain, target: strongSelf, action: #selector(strongSelf.action_outlines))
+            }
+            if var leftItems = strongSelf.pageViewController.navigationItem.leftBarButtonItems {
+                leftItems.append(outlinesItem)
+                strongSelf.pageViewController.navigationItem.setLeftBarButtonItems(leftItems, animated: true)
+            }
+
+        
+        }
+    }
+    
+    @objc fileprivate func action_outlines() {
+        
+    }
+    
+}
+
 
 //MARK: -
 fileprivate typealias WRPDFViewController_PageViewControllerDataSource = WRPDFViewController
 extension WRPDFViewController_PageViewControllerDataSource : UIPageViewControllerDataSource{
-    func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         
         var index = self.indexOf(viewController)
         if index <= 0 {
@@ -116,7 +180,7 @@ extension WRPDFViewController_PageViewControllerDataSource : UIPageViewControlle
         return pageController
     }
     
-    func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         
         var index = self.indexOf(viewController)
         if index < 0 || index + 1 > self.pdf.document!.numberOfPages {
@@ -141,7 +205,7 @@ extension WRPDFViewController_PageViewControllerDataSource : UIPageViewControlle
 //MARK: -
 fileprivate typealias WRPDFViewController_PageViewControllerDelegate = WRPDFViewController
 extension WRPDFViewController_PageViewControllerDelegate : UIPageViewControllerDelegate{
-    internal func pageViewController(_ pageViewController: UIPageViewController, spineLocationFor orientation: UIInterfaceOrientation) -> UIPageViewController.SpineLocation {
+    public func pageViewController(_ pageViewController: UIPageViewController, spineLocationFor orientation: UIInterfaceOrientation) -> UIPageViewController.SpineLocation {
         if orientation.isPortrait || UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.phone
         {
             // In portrait orientation or on iPhone: Set the spine position to "min" and the page view controller's view controllers array to contain just one view controller. Setting the spine position to 'UIPageViewControllerSpineLocationMid' in landscape orientation sets the doubleSided property to YES, so set it to NO here.
@@ -175,11 +239,11 @@ extension WRPDFViewController_PageViewControllerDelegate : UIPageViewControllerD
         return UIPageViewController.SpineLocation.mid
     }
     
-    func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
+    public func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
 //        print("\(pendingViewControllers)")
     }
 
-    func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+    public func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         
         
     }

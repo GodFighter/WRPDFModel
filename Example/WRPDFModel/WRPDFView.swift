@@ -18,36 +18,29 @@ class WRPDFView: UIView {
     var imageView: UIImageView!
 
     deinit {
+        self.imageView = nil
+        self.pdfImage = nil
         NotificationCenter.default.removeObserver(self)
     }
 
     init(frame: CGRect, scale: CGFloat) {
         super.init(frame: frame)
-        
-        let tiledLayer = CATiledLayer(layer: self)
-        tiledLayer.levelsOfDetail = 4
-        tiledLayer.levelsOfDetailBias = 3
+        self.isUserInteractionEnabled = false
         
         myScale = scale
         
         NotificationCenter.default.addObserver(self, selector: #selector(action_dark(_:)), name: WRPDFReaderConfig.Notify.dark.name, object: nil)
         
         self.imageView = UIImageView()
+        self.imageView.isUserInteractionEnabled = true
         self.addSubview(self.imageView)
-        
+                
     }
         
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    override static var layerClass: AnyClass {
-        get {
-            return WRPDFReaderConfig.shared.isTiled ? CATiledLayer.self : CALayer.self
-        }
-    }
-    
-    
+        
     fileprivate func image() -> UIImage {
         var image = UIImage()
 
@@ -95,107 +88,22 @@ class WRPDFView: UIView {
     override func draw(_ rect: CGRect) {
            
         if self.pdfImage == nil {
-            if self.layer.isKind(of: CATiledLayer.self) {
-                DispatchQueue.main.sync {
-                    
-                    var image = self.image()
-                    
-                    image = WRPDFView.grayImage(image)!
-
-                    if WRPDFReaderConfig.shared.isDark {
-                        self.pdfImage = WRPDFView.tintColor(WRPDFView.grayImage(self.image())!, tintColor: .black)
-                    } else {
-                        self.pdfImage = self.image()
-                    }
-                }
+            if WRPDFReaderConfig.shared.isDark {
+                self.pdfImage = WRPDFView.tintColor(WRPDFView.grayImage(self.image())!, tintColor: .black)
             } else {
-                if WRPDFReaderConfig.shared.isDark {
-                    let grayimage = WRPDFView.grayImage(self.image())!
-                    let ikage = WRPDFView.transparentColor(grayimage, colorMasking: [0, 32, 0, 32, 0, 32])
-                    self.pdfImage = WRPDFView.tintColor(ikage!, tintColor: .red)
-                } else {
-                    self.pdfImage = self.image()
-                }
-                
+                self.pdfImage = self.image()
             }
         }
 
         let scale = self.pdfImage!.size.height / self.pdfImage!.size.width
         let height = ceil(scale * self.bounds.width)
         self.imageView.frame = CGRect(x: 0, y: ceil((self.bounds.height - height) / 2.0), width: self.bounds.width, height: height)
+        self.imageView.backgroundColor = .white
         self.imageView.image = self.pdfImage!
-
+ 
     }
     
-    /*
-    override func draw(_ layer: CALayer, in ctx: CGContext) {
-
-        if self.pdfImage == nil {
-            if self.layer.isKind(of: CATiledLayer.self) {
-                DispatchQueue.main.sync {
-                    
-                    var image = self.image()
-                    
-                    image = WRPDFView.grayImage(image)!
-
-                    if WRPDFReaderConfig.shared.isDark {
-                        self.pdfImage = WRPDFView.tintColor(WRPDFView.grayImage(self.image())!, tintColor: .black)
-                    } else {
-                        self.pdfImage = self.image()
-                    }
-                }
-            } else {
-                if WRPDFReaderConfig.shared.isDark {
-                    self.pdfImage = WRPDFView.tintColor(WRPDFView.grayImage(self.image())!, tintColor: .black)
-                } else {
-                    self.pdfImage = self.image()
-                }
-                
-            }
-        }
-                    
-        
-        /*
-        ctx.setFillColor(WRPDFReaderConfig.shared.backgroundColor.cgColor)
-        ctx.fill(self.bounds)
-        ctx.saveGState()
-        ctx.restoreGState()
-
-        print("\(ctx)")
-        
-        ctx.setFillColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-        
-        let scale = self.pdfImage!.size.height / self.pdfImage!.size.width
-        
-        let height = ceil(scale * self.bounds.width)
-
-        ctx.fill(CGRect(x: 0, y: ceil((self.bounds.height - height) / 2.0), width: self.bounds.width, height: height))
-
-        // Print a blank page and return if our page is nil.
-        if ( self.pdfPage == nil ) {
-            print("page nil")
-            return
-        }
-
-        // save the cg state
-        ctx.saveGState()
-
-        // Flip the context so that the PDF page is rendered right side up.
-        ctx.translateBy(x: 0.0, y: self.bounds.size.height)
-        ctx.scaleBy(x: 1.0, y: -1.0)
-
-        let y : Int = Int((self.bounds.height - height) / 2.0)
-//
-        
-        ctx.draw((self.pdfImage?.cgImage)!, in: CGRect(x: 0, y:  CGFloat(y), width: self.bounds.width, height: ceil(height)))
-//        ctx.drawPDFPage(self.pdfPage!)
-        
-        ctx.restoreGState()
- */
-    }
-*/
-    
-    fileprivate static func tintColor(_ image : UIImage, tintColor: UIColor) -> UIImage? {
+    internal static func tintColor(_ image : UIImage, tintColor: UIColor) -> UIImage? {
 
         UIGraphicsBeginImageContextWithOptions(image.size, false, UIScreen.main.scale)
         
@@ -227,6 +135,7 @@ class WRPDFView: UIView {
             context?.draw(image.cgImage!, in: CGRect.init(x: 0, y: 0, width: image.size.width * image.scale, height: image.size.height * image.scale))
             let cgImage = context!.makeImage()
             let grayImage = UIImage(cgImage: cgImage!, scale: image.scale, orientation: image.imageOrientation)
+            UIGraphicsEndImageContext()
             return grayImage
             
         }
@@ -237,20 +146,5 @@ class WRPDFView: UIView {
             self.setNeedsDisplay()
         }
     }
-
-      static  func transparentColor(_ image: UIImage, colorMasking:[CGFloat]) -> UIImage? {
-            if let rawImageRef = image.cgImage {
-                UIGraphicsBeginImageContext(image.size)
-                if let maskedImageRef = rawImageRef.copy(maskingColorComponents: colorMasking) {
-                    let context: CGContext = UIGraphicsGetCurrentContext()!
-                    context.translateBy(x: 0.0, y: image.size.height)
-                    context.scaleBy(x: 1.0, y: -1.0)
-                    context.draw(maskedImageRef, in: CGRect(x:0, y:0, width:image.size.width, height:image.size.height))
-                    let result = UIGraphicsGetImageFromCurrentImageContext()
-                    UIGraphicsEndImageContext()
-                    return result
-                }
-            }
-            return nil
-        }
+    
 }

@@ -42,34 +42,49 @@ public extension WRPDFModel_Public {
         return document.numberOfPages
     }
     
-    var outlines : [WROutline] {
-        get {
-            if self.pdfOutlines == nil {
-                self.pdfOutlines = []
-
-                guard let document = self.document else {
-                    return []
-                }
-                      
-                if #available(iOS 11.0, *) {
-                    if let outlineDic : NSDictionary = document.outline {
-                        if let children = outlineDic["Children"] as? Array<NSDictionary> {
-                            self.pdfOutlines = children.map({ (info) -> WROutline in
-                                return WROutline.init(info)
-                            })
-                        }
-                    }
-                } else {
-                    guard let catalog = document.catalog else {
-                        return []
-                    }
-
-                    let rootNode = WRPDFNode(catalog: catalog)
-                    rootNode.child()
-                    self.pdfOutlines = rootNode.outlines
+    func getOutlines(_ completeBlock: @escaping ([WROutline]) -> ()) {
+        let queue = DispatchQueue.global()
+        queue.async {
+            if let pdfOutlines = self.pdfOutlines, pdfOutlines.count > 0 {
+                DispatchQueue.main.async {
+                    completeBlock(self.pdfOutlines!)
                 }
             }
-            return self.pdfOutlines!
+            
+            guard let document = self.document else {
+                completeBlock([])
+                return
+            }
+            if #available(iOS 11.0, *) {
+                if let outlineDic : NSDictionary = document.outline {
+                    if let children = outlineDic["Children"] as? Array<NSDictionary> {
+                        self.pdfOutlines = children.map({ (info) -> WROutline in
+                            return WROutline.init(info)
+                        })
+                    } else {
+                        completeBlock([])
+                        return
+                    }
+                }
+            } else {
+                guard let catalog = document.catalog else {
+                    completeBlock([])
+                    return
+                }
+
+                let rootNode = WRPDFNode(catalog: catalog)
+                rootNode.child()
+                self.pdfOutlines = rootNode.outlines
+            }
+            DispatchQueue.main.async {
+                completeBlock(self.pdfOutlines!)
+            }
+        }
+    }
+    
+    var outlines : [WROutline] {
+        get {
+            return self.pdfOutlines ?? []
         }
     }
     var pages: [CGPDFObjectRef] {

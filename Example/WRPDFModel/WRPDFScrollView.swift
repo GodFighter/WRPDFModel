@@ -16,10 +16,11 @@ class WRPDFScrollView: UIScrollView, UIScrollViewDelegate {
     var oldTiledPDFView: WRPDFView!
     var PDFScale = CGFloat()
     var tiledPDFPage: CGPDFPage!
-    
-    var coverView: UIView!
-    
+        
     var minRect : CGRect = .zero
+    
+    var tapBlock: (() -> ())?
+    
 
     func initialize() {
         decelerationRate = UIScrollView.DecelerationRate.fast
@@ -28,7 +29,10 @@ class WRPDFScrollView: UIScrollView, UIScrollViewDelegate {
         minimumZoomScale = 0.5
         maximumZoomScale = 5
         backgroundImageView = UIView(frame: frame)
+        self.addSubview(backgroundImageView)
         oldTiledPDFView = WRPDFView(frame: pageRect, scale: PDFScale)
+        
+        backgroundImageView.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(action_tap(_:))))
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -132,14 +136,15 @@ class WRPDFScrollView: UIScrollView, UIScrollViewDelegate {
         // Add the new TiledPDFView to the PDFScrollView.
         addSubview(newTiledPDFView)
         tiledPDFView = newTiledPDFView
-        
-        if self.coverView == nil {
-            self.coverView = UIView()
-//            self.coverView.backgroundColor = UIColor.red.withAlphaComponent(0.6)
-            self.insertSubview(self.coverView, aboveSubview: tiledPDFView)
-            self.coverView.frame = tiledPDFView.frame
-            self.coverView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        }
-        self.bringSubviewToFront(self.coverView)
+//        tiledPDFView.layer.setNeedsDisplay()
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//            self.tiledPDFView.layer.setNeedsDisplay()
+//        }
+
     }
+    
+    @objc func action_tap(_ sender: Any) {
+        self.tapBlock?()
+    }
+
 }

@@ -18,22 +18,36 @@ class WRPDFPageViewController: UIViewController {
 
     var pdf: CGPDFDocument!
     var page: CGPDFPage!
+    
+    weak var pdfModel: WRPDFModel!
 
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    convenience init(_ pdfModel: WRPDFModel, pageNumber : Int) {
+        self.init(nibName: nil, bundle: nil)
+        self.pdfModel = pdfModel
+        self.pageNumber = pageNumber
 
+        self.scrollView = WRPDFScrollView()
+        self.view.addSubview(scrollView)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let url = Bundle.main.url(forResource: "投资的常识1", withExtension: "pdf")
-        let model = WRPDFModel(url!)
-
-        self.pdf = model.document
+        self.pdf = self.pdfModel.document
         self.page = pdf.page(at: self.pageNumber)
                 
-        self.scrollView = WRPDFScrollView()
-        self.view.addSubview(scrollView)
         scrollView.bounds = self.view.bounds
         scrollView.center = self.view.center
         scrollView.setPDFPage(page)
