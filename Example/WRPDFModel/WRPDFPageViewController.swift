@@ -19,6 +19,10 @@ class WRPDFPageViewController: UIViewController {
     var pdf: CGPDFDocument!
     var page: CGPDFPage!
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -27,14 +31,16 @@ class WRPDFPageViewController: UIViewController {
 
         self.pdf = model.document
         self.page = pdf.page(at: self.pageNumber)
-        
-        
+                
         self.scrollView = WRPDFScrollView()
         self.view.addSubview(scrollView)
+        scrollView.bounds = self.view.bounds
         scrollView.center = self.view.center
-        scrollView.backgroundColor = .red
         scrollView.setPDFPage(page)
         scrollView.isUserInteractionEnabled = UIApplication.shared.statusBarOrientation.isPortrait
+        
+        self.view.backgroundColor = WRPDFReaderConfig.shared.backgroundColor
+        NotificationCenter.default.addObserver(self, selector: #selector(action_dark(_:)), name: WRPDFReaderConfig.Notify.dark.name, object: nil)
     }
     
     override func viewDidLayoutSubviews() {
@@ -67,14 +73,10 @@ class WRPDFPageViewController: UIViewController {
     }
 
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    @objc func action_dark(_ notification: Notification) {
+        if let _ = notification.object as? Bool {
+            self.view.backgroundColor = WRPDFReaderConfig.shared.backgroundColor
+        }
     }
-    */
 
 }

@@ -22,8 +22,7 @@ class WRPDFScrollView: UIScrollView, UIScrollViewDelegate {
     func initialize() {
         decelerationRate = UIScrollView.DecelerationRate.fast
         delegate = self
-        layer.borderColor = UIColor.lightGray.cgColor
-        layer.borderWidth = 5
+
         minimumZoomScale = 0.5
         maximumZoomScale = 5
         backgroundImageView = UIView(frame: frame)
@@ -52,7 +51,7 @@ class WRPDFScrollView: UIScrollView, UIScrollViewDelegate {
             pageRect = tiledPDFPage.getBoxRect(CGPDFBox.mediaBox)
 
             PDFScale = frame.size.width / pageRect.size.width
-            pageRect = CGRect(x: pageRect.origin.x, y: pageRect.origin.y, width: pageRect.size.width * PDFScale, height: pageRect.size.height * PDFScale)
+            pageRect = CGRect(x: pageRect.origin.x, y: ceil((self.bounds.height - ceil(pageRect.size.height * PDFScale)) / 2.0), width: ceil(pageRect.size.width * PDFScale), height: ceil(pageRect.size.height * PDFScale))
         }
 
         // Create the TiledPDFView based on the size of the PDF page and scale it to fit the view.
@@ -89,7 +88,7 @@ class WRPDFScrollView: UIScrollView, UIScrollViewDelegate {
          */
         tiledPDFView.contentScaleFactor = 1.0
         if minRect.equalTo(.zero) {
-            minRect = frameToCenter
+            minRect = pageRect
         }
     }
     
@@ -132,5 +131,4 @@ class WRPDFScrollView: UIScrollView, UIScrollViewDelegate {
         addSubview(newTiledPDFView)
         tiledPDFView = newTiledPDFView
     }
-
 }

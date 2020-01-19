@@ -75,8 +75,18 @@ class ViewController: UIViewController {
         
         let url = Bundle.main.url(forResource: "投资的常识1", withExtension: "pdf")
         let pdfController = WRPDFViewController.init(url!)
+        WRPDFReaderConfig.shared.hasAnimated = true
         pdfController.modalPresentationStyle = .fullScreen
+        WRPDFReaderConfig.shared.isDark = false
+        WRPDFReaderConfig.shared.isTiled = false
         self.present(pdfController, animated: true, completion: nil)
+
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//            WRPDFReaderConfig.shared.isDark = false
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//                WRPDFReaderConfig.shared.isDark = true
+//            }
+//        }
         
 //        let pdfController = WRPDFPageViewController.init()
 //        pdfController.modalPresentationStyle = .fullScreen

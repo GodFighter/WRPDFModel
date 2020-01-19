@@ -14,25 +14,29 @@ class WRPDFView: UIView {
     
     var pdfImage: UIImage?
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     init(frame: CGRect, scale: CGFloat) {
         super.init(frame: frame)
         
         let tiledLayer = CATiledLayer(layer: self)
         tiledLayer.levelsOfDetail = 4
         tiledLayer.levelsOfDetailBias = 3
-//        tiledLayer.tileSize = CGSize(width: 200, height: 200)
         
         myScale = scale
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(action_dark(_:)), name: WRPDFReaderConfig.Notify.dark.name, object: nil)
     }
-    
+        
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override static var layerClass: AnyClass {
         get {
-            return CALayer.self
-//            return CATiledLayer.self
+            return WRPDFReaderConfig.shared.isTiled ? CATiledLayer.self : CALayer.self
         }
     }
     
@@ -90,61 +94,59 @@ class WRPDFView: UIView {
         if self.pdfImage == nil {
             if self.layer.isKind(of: CATiledLayer.self) {
                 DispatchQueue.main.sync {
-//                    self.pdfImage = self.image()
-                    
-//                    let data = self.image().pngData()
                     
                     var image = self.image()
                     
                     image = WRPDFView.grayImage(image)!
 
-                    self.pdfImage = WRPDFView.tintColor(image, tintColor: .black)
-
-//                    self.pdfImage = WRPDFView.tintColor(self.image(), tintColor: .clear)
+                    if WRPDFReaderConfig.shared.isDark {
+                        self.pdfImage = WRPDFView.tintColor(WRPDFView.grayImage(self.image())!, tintColor: .black)
+                    } else {
+                        self.pdfImage = self.image()
+                    }
                 }
             } else {
-//                self.pdfImage = self.image()
-                self.pdfImage = WRPDFView.tintColor(WRPDFView.grayImage(self.image())!, tintColor: .black)
+                if WRPDFReaderConfig.shared.isDark {
+                    self.pdfImage = WRPDFView.tintColor(WRPDFView.grayImage(self.image())!, tintColor: .black)
+                } else {
+                    self.pdfImage = self.image()
+                }
+                
             }
         }
         
-        ctx.setFillColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-        ctx.setStrokeColor(UIColor.clear.cgColor)
-//        
+        ctx.setFillColor(WRPDFReaderConfig.shared.backgroundColor.cgColor)
         ctx.fill(self.bounds)
-        ctx.stroke(self.bounds)
+        ctx.saveGState()
+        ctx.restoreGState()
+
+        
+        ctx.setFillColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+        
+        let scale = self.pdfImage!.size.height / self.pdfImage!.size.width
+        
+        let height = scale * self.bounds.width
+
+        ctx.fill(CGRect(x: 0, y: (self.bounds.height - height) / 2.0, width: self.bounds.width, height: height))
 
         // Print a blank page and return if our page is nil.
-        if ( self.pdfPage == nil )
-        {
+        if ( self.pdfPage == nil ) {
             print("page nil")
             return
         }
 
         // save the cg state
         ctx.saveGState()
-        
 
         // Flip the context so that the PDF page is rendered right side up.
         ctx.translateBy(x: 0.0, y: self.bounds.size.height)
         ctx.scaleBy(x: 1.0, y: -1.0)
 
-        // Scale the context so that the PDF page is rendered at the correct size for the zoom level.
-//        ctx.scaleBy(x: self.myScale, y: self.myScale)
-
-//        ctx.setBlendMode(.darken)
-
-
-        // draw the page, restore and exit
-        
-        let height = self.pdfImage!.size.height / self.pdfImage!.size.width * self.bounds.width
         let y : Int = Int((self.bounds.height - height) / 2.0)
 //
         ctx.draw((self.pdfImage?.cgImage)!, in: CGRect(x: 0, y:  CGFloat(y), width: self.bounds.width, height: ceil(height)), byTiling: false)
 //        ctx.drawPDFPage(self.pdfPage!)
-//        ctx.setBlendMode(.exclusion)
-//        ctx.drawPDFPage(self.pdfPage!)
-
+        
         ctx.restoreGState()
     }
 
@@ -185,4 +187,11 @@ class WRPDFView: UIView {
             
         }
     
+    @objc func action_dark(_ notification: Notification) {
+        if let _ = notification.object as? Bool {
+            self.pdfImage = nil
+            self.setNeedsDisplay()
+        }
+    }
+
 }

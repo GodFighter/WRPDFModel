@@ -10,9 +10,8 @@ import UIKit
 import WRPDFModel
 
 class WRPDFViewController: UIViewController {
-
-    var pageViewController: UIPageViewController!
     
+    var pageViewController: UIPageViewController!
     
     var pdf: WRPDFModel!
     var url : URL!
@@ -38,12 +37,15 @@ class WRPDFViewController: UIViewController {
 
         super.viewDidLoad()
     
-        pageViewController = UIPageViewController(transitionStyle: .pageCurl, navigationOrientation: .horizontal, options: nil)
-        pageViewController.isDoubleSided = true
+        let transitionStyle : UIPageViewController.TransitionStyle = WRPDFReaderConfig.shared.hasAnimated ? .pageCurl : .scroll
+        
+
+        pageViewController = UIPageViewController(transitionStyle: transitionStyle, navigationOrientation: .horizontal, options: nil)
+        pageViewController.isDoubleSided = pageViewController.transitionStyle == .pageCurl
         pageViewController.delegate = self
         pageViewController.dataSource = self
-        
-        let startViewController = self.viewControllerAt(0)
+
+        let startViewController = self.viewControllerAt(0,isBack: false)
         let viewControllers = [startViewController]
         
         pageViewController.setViewControllers(viewControllers, direction: .forward, animated: false, completion: nil)
@@ -54,14 +56,16 @@ class WRPDFViewController: UIViewController {
         let pageViewRect = self.view.bounds
         pageViewController.view.frame = pageViewRect
         pageViewController.didMove(toParent: self)
-        
-        self.view.gestureRecognizers = pageViewController.gestureRecognizers
     }
     
-    func viewControllerAt(_ index: Int) -> WRPDFPageViewController {
-        let controller = WRPDFPageViewController()
-        controller.page = self.pdf.document?.page(at: index + 1)
-        controller.pageNumber = index + 1
+    func viewControllerAt(_ index: Int, isBack: Bool) -> UIViewController {
+        let controller = isBack ? WRPDFBackPageViewController() : WRPDFPageViewController()
+        if let viewController = controller as? WRPDFBackPageViewController {
+            viewController.pageNumber = index + 1
+        } else if let viewController = controller as? WRPDFPageViewController {
+            viewController.page = self.pdf.document?.page(at: index + 1)
+            viewController.pageNumber = index + 1
+        }
         return controller
     }
 
@@ -74,6 +78,52 @@ class WRPDFViewController: UIViewController {
     
 
     
+}
+
+//MARK: -
+fileprivate typealias WRPDFViewController_PageViewControllerDataSource = WRPDFViewController
+extension WRPDFViewController_PageViewControllerDataSource : UIPageViewControllerDataSource{
+    func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
+        
+        var index = self.indexOf(viewController)
+        if index <= 0 {
+            return nil
+        }
+
+        let isBack = pageViewController.isDoubleSided && viewController.isKind(of: WRPDFPageViewController.self)
+
+        if !isBack {
+            index -= 1
+        }
+
+        let pageController = self.viewControllerAt(index, isBack: isBack)
+        if let backPageController = pageController as? WRPDFBackPageViewController  {
+            backPageController.updateWithViewController(viewController)
+        }
+
+        return pageController
+    }
+    
+    func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
+        
+        var index = self.indexOf(viewController)
+        if index < 0 || index + 1 > self.pdf.document!.numberOfPages {
+            return nil
+        }
+            
+        let isBack = pageViewController.isDoubleSided && viewController.isKind(of: WRPDFPageViewController.self)
+
+        if !isBack  {
+            index += 1
+        }
+        
+        let pageController = self.viewControllerAt(index, isBack: isBack)
+        if let backPageController = pageController as? WRPDFBackPageViewController  {
+            backPageController.updateWithViewController(viewController)
+        }
+
+        return pageController
+    }
 }
 
 //MARK: -
@@ -113,46 +163,9 @@ extension WRPDFViewController_PageViewControllerDelegate : UIPageViewControllerD
         return UIPageViewController.SpineLocation.mid
     }
 
-}
-
-//MARK: -
-fileprivate typealias WRPDFViewController_PageViewControllerDataSource = WRPDFViewController
-extension WRPDFViewController_PageViewControllerDataSource : UIPageViewControllerDataSource{
-    func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
+    func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         
-        // 翻页累计
-        tempNumber -= 1
-
-        if abs(tempNumber) % 2 == 0 { // 背面
-            let backController = WRPDFBackPageViewController()
-            backController.updateWithViewController(viewController)
-            backController.pageNumber = tempNumber
-            return backController
-        }
         
-        var index = self.indexOf(viewController)
-        if index <= 0 {
-            return nil
-        }
-        index -= 1
-        return self.viewControllerAt(index)
-    }
-    
-    func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        tempNumber += 1
-
-        if abs(tempNumber) % 2 == 0 { // 背面
-            let backController = WRPDFBackPageViewController()
-            backController.updateWithViewController(viewController)
-            return backController
-        }
-        
-
-        let index = self.indexOf(viewController)
-        if index < 0 || index + 1 > self.pdf.document!.numberOfPages {
-            return nil
-        }
-        return self.viewControllerAt(index + 1)
     }
 }
 

@@ -14,14 +14,20 @@ class WRPDFBackPageViewController: UIViewController {
     var imageview: UIImageView!
     var pageNumber: Int = 18
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        self.view.backgroundColor = WRPDFReaderConfig.shared.backgroundColor
+        NotificationCenter.default.addObserver(self, selector: #selector(action_dark(_:)), name: WRPDFReaderConfig.Notify.dark.name, object: nil)
 
     }
     
     func updateWithViewController(_ controller: UIViewController) {
         self.image = self.captureImage(controller.view)
-        self.view.backgroundColor = .red
         if imageview == nil {
             imageview = UIImageView()
             self.view.addSubview(imageview)
@@ -47,5 +53,10 @@ class WRPDFBackPageViewController: UIViewController {
         return image!
     }
 
-    
+    @objc func action_dark(_ notification: Notification) {
+        if let _ = notification.object as? Bool {
+            self.view.backgroundColor = WRPDFReaderConfig.shared.backgroundColor
+        }
+    }
+
 }
