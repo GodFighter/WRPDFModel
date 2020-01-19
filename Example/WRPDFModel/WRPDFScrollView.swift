@@ -17,6 +17,8 @@ class WRPDFScrollView: UIScrollView, UIScrollViewDelegate {
     var PDFScale = CGFloat()
     var tiledPDFPage: CGPDFPage!
     
+    var coverView: UIView!
+    
     var minRect : CGRect = .zero
 
     func initialize() {
@@ -130,5 +132,14 @@ class WRPDFScrollView: UIScrollView, UIScrollViewDelegate {
         // Add the new TiledPDFView to the PDFScrollView.
         addSubview(newTiledPDFView)
         tiledPDFView = newTiledPDFView
+        
+        if self.coverView == nil {
+            self.coverView = UIView()
+//            self.coverView.backgroundColor = UIColor.red.withAlphaComponent(0.6)
+            self.insertSubview(self.coverView, aboveSubview: tiledPDFView)
+            self.coverView.frame = tiledPDFView.frame
+            self.coverView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        }
+        self.bringSubviewToFront(self.coverView)
     }
 }
