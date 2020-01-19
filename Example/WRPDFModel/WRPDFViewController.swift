@@ -18,7 +18,10 @@ class WRPDFViewController: UIViewController {
     
     fileprivate var tempNumber:NSInteger = 1
 
-    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
@@ -39,7 +42,6 @@ class WRPDFViewController: UIViewController {
     
         let transitionStyle : UIPageViewController.TransitionStyle = WRPDFReaderConfig.shared.hasAnimated ? .pageCurl : .scroll
         
-
         pageViewController = UIPageViewController(transitionStyle: transitionStyle, navigationOrientation: .horizontal, options: nil)
         pageViewController.isDoubleSided = pageViewController.transitionStyle == .pageCurl
         pageViewController.delegate = self
@@ -56,6 +58,10 @@ class WRPDFViewController: UIViewController {
         let pageViewRect = self.view.bounds
         pageViewController.view.frame = pageViewRect
         pageViewController.didMove(toParent: self)
+        
+        pageViewController.view.backgroundColor = WRPDFReaderConfig.shared.backgroundColor
+        NotificationCenter.default.addObserver(self, selector: #selector(action_dark(_:)), name: WRPDFReaderConfig.Notify.dark.name, object: nil)
+
     }
     
     func viewControllerAt(_ index: Int, isBack: Bool) -> UIViewController {
@@ -63,7 +69,7 @@ class WRPDFViewController: UIViewController {
         if let viewController = controller as? WRPDFBackPageViewController {
             viewController.pageNumber = index + 1
         } else if let viewController = controller as? WRPDFPageViewController {
-            viewController.page = self.pdf.document?.page(at: index + 1)
+//            viewController.page = self.pdf.document?.page(at: index + 1)
             viewController.pageNumber = index + 1
         }
         return controller
@@ -76,8 +82,12 @@ class WRPDFViewController: UIViewController {
         return (viewController as! WRPDFBackPageViewController).pageNumber - 1
     }
     
+    @objc func action_dark(_ notification: Notification) {
+        if let _ = notification.object as? Bool {
+            pageViewController.view.backgroundColor = WRPDFReaderConfig.shared.backgroundColor
+        }
+    }
 
-    
 }
 
 //MARK: -
@@ -129,38 +139,42 @@ extension WRPDFViewController_PageViewControllerDataSource : UIPageViewControlle
 //MARK: -
 fileprivate typealias WRPDFViewController_PageViewControllerDelegate = WRPDFViewController
 extension WRPDFViewController_PageViewControllerDelegate : UIPageViewControllerDelegate{
-    internal func pageViewController(_ pageViewController: UIPageViewController, spineLocationFor orientation: UIInterfaceOrientation) -> UIPageViewController.SpineLocation {
-        if orientation.isPortrait || UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.phone
-        {
-            // In portrait orientation or on iPhone: Set the spine position to "min" and the page view controller's view controllers array to contain just one view controller. Setting the spine position to 'UIPageViewControllerSpineLocationMid' in landscape orientation sets the doubleSided property to YES, so set it to NO here.
-
-            let currentViewController = pageViewController.viewControllers![0] as UIViewController
-            let viewControllers = [currentViewController]
-            pageViewController.setViewControllers(viewControllers, direction: UIPageViewController.NavigationDirection.forward, animated: true, completion: nil)
-//            pageViewController.isDoubleSided = false
-            return UIPageViewController.SpineLocation.min
-        }
-
-        // In landscape orientation: Set set the spine location to "mid" and the page view controller's view controllers array to contain two view controllers. If the current page is even, set it to contain the current and next view controllers; if it is odd, set the array to contain the previous and current view controllers.
-        let currentViewController = pageViewController.viewControllers?[0] as! WRPDFPageViewController
-
-        var viewControllers:[UIViewController] = []
-        let indexOfCurrentViewController = self.indexOf(currentViewController)
-
-        if indexOfCurrentViewController % 2 == 0
-        {
-            let nextViewController: UIViewController = self.pageViewController(pageViewController, viewControllerAfter: currentViewController)!
-            viewControllers = [currentViewController, nextViewController]
-        }
-        else
-        {
-            let previousViewController: UIViewController = self.pageViewController(pageViewController, viewControllerBefore: currentViewController)!
-            viewControllers = [previousViewController, currentViewController]
-        }
-
-        pageViewController.setViewControllers(viewControllers, direction: UIPageViewController.NavigationDirection.forward, animated: true, completion: nil)
-
-        return UIPageViewController.SpineLocation.mid
+//    internal func pageViewController(_ pageViewController: UIPageViewController, spineLocationFor orientation: UIInterfaceOrientation) -> UIPageViewController.SpineLocation {
+//        if orientation.isPortrait || UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.phone
+//        {
+//            // In portrait orientation or on iPhone: Set the spine position to "min" and the page view controller's view controllers array to contain just one view controller. Setting the spine position to 'UIPageViewControllerSpineLocationMid' in landscape orientation sets the doubleSided property to YES, so set it to NO here.
+//
+//            let currentViewController = pageViewController.viewControllers![0] as UIViewController
+//            let viewControllers = [currentViewController]
+//            pageViewController.setViewControllers(viewControllers, direction: UIPageViewController.NavigationDirection.forward, animated: false, completion: nil)
+////            pageViewController.isDoubleSided = false
+//            return UIPageViewController.SpineLocation.min
+//        }
+//
+//        // In landscape orientation: Set set the spine location to "mid" and the page view controller's view controllers array to contain two view controllers. If the current page is even, set it to contain the current and next view controllers; if it is odd, set the array to contain the previous and current view controllers.
+//        let currentViewController = pageViewController.viewControllers?[0] as! WRPDFPageViewController
+//
+//        var viewControllers:[UIViewController] = []
+//        let indexOfCurrentViewController = self.indexOf(currentViewController)
+//
+//        if indexOfCurrentViewController % 2 == 0
+//        {
+//            let nextViewController: UIViewController = self.pageViewController(pageViewController, viewControllerAfter: currentViewController)!
+//            viewControllers = [currentViewController, nextViewController]
+//        }
+//        else
+//        {
+//            let previousViewController: UIViewController = self.pageViewController(pageViewController, viewControllerBefore: currentViewController)!
+//            viewControllers = [previousViewController, currentViewController]
+//        }
+//
+//        pageViewController.setViewControllers(viewControllers, direction: UIPageViewController.NavigationDirection.forward, animated: true, completion: nil)
+//
+//        return UIPageViewController.SpineLocation.mid
+//    }
+    
+    func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
+        print("\(pendingViewControllers)")
     }
 
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {

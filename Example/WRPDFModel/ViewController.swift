@@ -75,9 +75,9 @@ class ViewController: UIViewController {
         
         let url = Bundle.main.url(forResource: "投资的常识1", withExtension: "pdf")
         let pdfController = WRPDFViewController.init(url!)
-        WRPDFReaderConfig.shared.hasAnimated = true
+        WRPDFReaderConfig.shared.hasAnimated = false
         pdfController.modalPresentationStyle = .fullScreen
-        WRPDFReaderConfig.shared.isDark = false
+        WRPDFReaderConfig.shared.isDark = true
         WRPDFReaderConfig.shared.isTiled = false
         self.present(pdfController, animated: true, completion: nil)
 
