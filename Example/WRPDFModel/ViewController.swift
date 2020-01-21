@@ -11,6 +11,8 @@ import WRPDFModel
 
 class ViewController: UIViewController {
 
+    var isappeared = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -75,18 +77,23 @@ class ViewController: UIViewController {
         
         WRPDFReaderConfig.shared.hasAnimated = false
         WRPDFReaderConfig.shared.isDark = true
+        WRPDFReaderConfig.shared.showSearchItem = true
         
         WRPDFReaderConfig.shared.backImage = UIImage(named: "navigationBar_Back")
 
-        let url = Bundle.main.url(forResource: "投资的常识1", withExtension: "pdf")
-        let pdfController = WRPDFViewController.init(url!)
-        self.present(pdfController, animated: true, completion: nil)
-        
-        pdfController.setOutlinesItem(image: UIImage(named: "navigationBar_Back"))
+        if isappeared == false {
+            isappeared = true
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            pdfController.setPageController(.vertical)
+            let url = Bundle.main.url(forResource: "投资的常识1", withExtension: "pdf")
+            let pdfController = WRPDFViewController.init(url!)
+            self.present(pdfController, animated: true, completion: nil)
+            
             pdfController.setOutlinesItem(image: UIImage(named: "navigationBar_Back"))
+
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//                pdfController.setPageController(.vertical)
+//                pdfController.setOutlinesItem(image: UIImage(named: "navigationBar_Back"))
+//            }
         }
         
 //        let pdfController = WRPDFPageViewController.init()

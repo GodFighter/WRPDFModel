@@ -87,8 +87,14 @@ open class WRPDFReaderConfig: NSObject {
     
     /**目录按钮图片*/
     @objc public var outlinesImage: UIImage?
-    /**目录按钮b标题*/
+    /**目录按钮标题*/
     @objc public var outlinesTitle: String?
+    
+    /**搜索按钮图片*/
+    @objc public var searchImage: UIImage?
+    /**搜索按钮标题*/
+    @objc public var searchTitle: String?
+
 
     internal var backgroundColor: UIColor {
         return WRPDFReaderConfig.shared.isDark ? WRPDFReaderConfig.shared.darkColor : WRPDFReaderConfig.shared.lightColor

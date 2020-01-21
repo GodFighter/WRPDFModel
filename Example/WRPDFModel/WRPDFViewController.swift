@@ -13,11 +13,12 @@ import WRPDFModel
     
     var pageViewController: UIPageViewController!
     
-    var pdf: WRPDFModel!
+    var pdf: WRPDFModel?
     var url : URL!
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+        self.pdf = nil
     }
 
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
@@ -29,6 +30,10 @@ import WRPDFModel
         self.url = url
         self.pdf = WRPDFModel(url)
         
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//            self.pdf!.searchStop()
+//        }
+
         setPageController(UIPageViewController.NavigationOrientation.horizontal)
     }
     
@@ -49,7 +54,7 @@ import WRPDFModel
     }
     
     func viewControllerAt(_ index: Int, isBack: Bool) -> UIViewController {
-        let controller = isBack ? WRPDFBackPageViewController.init(index + 1) : WRPDFPageViewController.init(self.pdf, pageNumber: index + 1)
+        let controller = isBack ? WRPDFBackPageViewController.init(index + 1) : WRPDFPageViewController.init(self.pdf!, pageNumber: index + 1)
         if let viewController = controller as? WRPDFPageViewController {
             viewController.scrollView.tapBlock = { [weak self] in
                 self?.pageViewController?.navigationController?.setNavigationBarHidden(!(self?.pageViewController?.navigationController?.navigationBar.isHidden ?? true), animated: true)
@@ -72,7 +77,7 @@ import WRPDFModel
     }
     
     @objc func action_back(_ sender: Any) {
-        
+        self.dismiss(animated: true, completion: nil)
     }
 
     internal static func color(_ size : CGSize, _ color : UIColor) -> UIImage? {
@@ -94,11 +99,12 @@ import WRPDFModel
 
 }
 
+//MARK: -
 fileprivate typealias WRPDFViewController_Access = WRPDFViewController
 public extension WRPDFViewController_Access{
     @objc func access_outlinesController() {
                 
-        let outlinesController = WRPDFOutlinesViewController(self.pdf.outlines)
+        let outlinesController = WRPDFOutlinesViewController(self.pdf!.outlines)
         let navigationController = UINavigationController(rootViewController: outlinesController)
         self.present(navigationController, animated: true, completion: nil)
 
@@ -108,10 +114,16 @@ public extension WRPDFViewController_Access{
                 self?.pageViewController.setViewControllers(viewControllers, direction: .forward, animated: false, completion: nil)
             }
         }
-
+    }
+    
+    @objc func access_searchController() {
+        let searchController = WRPDFSearchViewController.init(self.pdf!)
+        let navigationController = UINavigationController(rootViewController: searchController)
+        self.present(navigationController, animated: true, completion: nil)
     }
 }
 
+//MARK: -
 fileprivate typealias WRPDFViewController_Public = WRPDFViewController
 public extension WRPDFViewController_Public{
     
@@ -123,7 +135,7 @@ public extension WRPDFViewController_Public{
         WRPDFReaderConfig.shared.outlinesImage = image
         WRPDFReaderConfig.shared.outlinesTitle = title
 
-        self.pdf.getOutlines { [weak self] (outlines) in
+        self.pdf!.getOutlines { [weak self] (outlines) in
             guard let strongSelf = self, outlines.count > 0 else {
                 return
             }
@@ -184,6 +196,9 @@ private extension WRPDFViewController_Private {
         pageViewController?.navigationController?.removeFromParent()
     }
     func setNavigationBar() {
+        
+        /*leftItems*/
+        do {
             var leftItems = [UIBarButtonItem]()
             
             var backBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .cancel, target: self, action: #selector(action_back(_:)))
@@ -196,11 +211,28 @@ private extension WRPDFViewController_Private {
             leftItems.append(backBarButtonItem)
 
             pageViewController.navigationItem.leftBarButtonItems = leftItems
-        pageViewController.navigationController?.navigationBar.setBackgroundImage(WRPDFViewController.color((pageViewController.navigationController?.navigationBar.bounds.size)!, WRPDFReaderConfig.shared.navigationBarColor)
-                , for: .default)
-            // 纯色的图片，isTranslucent为no，会从y=64开始绘制
-            pageViewController.navigationController?.navigationBar.isTranslucent = true
-            pageViewController.navigationController?.navigationBar.tintColor = WRPDFReaderConfig.shared.navigationTintColor
+        }
+        
+        /*rightItems*/
+        do {
+            var rightItems = [UIBarButtonItem]()
+            if WRPDFReaderConfig.shared.showSearchItem {
+                var searchItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(access_searchController))
+                if let seachTitle = WRPDFReaderConfig.shared.searchTitle {
+                    searchItem = UIBarButtonItem.init(title: seachTitle, style: .plain, target: self, action: #selector(access_searchController))
+                } else if let seachImage = WRPDFReaderConfig.shared.searchImage {
+                    searchItem = UIBarButtonItem(image: seachImage, style: .plain, target: self, action: #selector(access_searchController))
+                }
+                rightItems.append(searchItem)
+            }
+            
+            pageViewController.navigationItem.rightBarButtonItems = rightItems
+        }
+    pageViewController.navigationController?.navigationBar.setBackgroundImage(WRPDFViewController.color((pageViewController.navigationController?.navigationBar.bounds.size)!, WRPDFReaderConfig.shared.navigationBarColor)
+            , for: .default)
+        // 纯色的图片，isTranslucent为no，会从y=64开始绘制
+        pageViewController.navigationController?.navigationBar.isTranslucent = true
+        pageViewController.navigationController?.navigationBar.tintColor = WRPDFReaderConfig.shared.navigationTintColor
     }
 }
 
@@ -231,7 +263,7 @@ extension WRPDFViewController_PageViewControllerDataSource : UIPageViewControlle
     public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         
         var index = self.indexOf(viewController)
-        if index < 0 || index + 1 > self.pdf.document!.numberOfPages {
+        if index < 0 || index + 1 > self.pdf!.document!.numberOfPages {
             return nil
         }
             

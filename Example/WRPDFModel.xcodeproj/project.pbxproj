@@ -16,6 +16,8 @@
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		BB2A251523D4B9000084B200 /* WRPDFOutlinesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2A251423D4B9000084B200 /* WRPDFOutlinesViewController.swift */; };
 		BB32DC7F23D5353200BB154C /* WRPDFHorizontalOutlineCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB32DC7E23D5353200BB154C /* WRPDFHorizontalOutlineCell.swift */; };
+		BB39363D23D6DCFD0069DB36 /* WRPDFSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39363C23D6DCFD0069DB36 /* WRPDFSearchViewController.swift */; };
+		BB39364023D6E56F0069DB36 /* WRPDFSearchHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39363F23D6E56F0069DB36 /* WRPDFSearchHeaderView.swift */; };
 		BBA2294C23CEF02A00C440F4 /* 投资的常识1.pdf in Resources */ = {isa = PBXBuildFile; fileRef = BBA2294B23CEF02A00C440F4 /* 投资的常识1.pdf */; };
 		BBB98E8A23D1608A00C58427 /* WRPDFView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB98E8923D1608A00C58427 /* WRPDFView.swift */; };
 		BBB98E8E23D1A61700C58427 /* WRPDFScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB98E8D23D1A61700C58427 /* WRPDFScrollView.swift */; };
@@ -43,6 +45,8 @@
 		B83E974A3CBEAE283B44AD29 /* Pods-WRPDFModel_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WRPDFModel_Tests.debug.xcconfig"; path = "Target Support Files/Pods-WRPDFModel_Tests/Pods-WRPDFModel_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		BB2A251423D4B9000084B200 /* WRPDFOutlinesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WRPDFOutlinesViewController.swift; sourceTree = "<group>"; };
 		BB32DC7E23D5353200BB154C /* WRPDFHorizontalOutlineCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WRPDFHorizontalOutlineCell.swift; sourceTree = "<group>"; };
+		BB39363C23D6DCFD0069DB36 /* WRPDFSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WRPDFSearchViewController.swift; sourceTree = "<group>"; };
+		BB39363F23D6E56F0069DB36 /* WRPDFSearchHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WRPDFSearchHeaderView.swift; sourceTree = "<group>"; };
 		BBA2294B23CEF02A00C440F4 /* 投资的常识1.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "投资的常识1.pdf"; sourceTree = "<group>"; };
 		BBB98E8923D1608A00C58427 /* WRPDFView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WRPDFView.swift; sourceTree = "<group>"; };
 		BBB98E8D23D1A61700C58427 /* WRPDFScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WRPDFScrollView.swift; sourceTree = "<group>"; };
@@ -121,6 +125,7 @@
 				5669247223D3520A00106D02 /* WRPDFBackPageViewController.swift */,
 				5669246F23D33F2F00106D02 /* WRPDFViewController.swift */,
 				BB2A251323D4B8EA0084B200 /* Outlines */,
+				BB39363B23D6DCE90069DB36 /* Search */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
 			);
 			name = "Example for WRPDFModel";
@@ -152,6 +157,15 @@
 				BB32DC7E23D5353200BB154C /* WRPDFHorizontalOutlineCell.swift */,
 			);
 			path = Outlines;
+			sourceTree = "<group>";
+		};
+		BB39363B23D6DCE90069DB36 /* Search */ = {
+			isa = PBXGroup;
+			children = (
+				BB39363C23D6DCFD0069DB36 /* WRPDFSearchViewController.swift */,
+				BB39363F23D6E56F0069DB36 /* WRPDFSearchHeaderView.swift */,
+			);
+			path = Search;
 			sourceTree = "<group>";
 		};
 		BBA2294823CEEF9D00C440F4 /* Resource */ = {
@@ -287,8 +301,10 @@
 				BBB98E8E23D1A61700C58427 /* WRPDFScrollView.swift in Sources */,
 				5669247323D3520A00106D02 /* WRPDFBackPageViewController.swift in Sources */,
 				5669247023D33F2F00106D02 /* WRPDFViewController.swift in Sources */,
+				BB39363D23D6DCFD0069DB36 /* WRPDFSearchViewController.swift in Sources */,
 				BB32DC7F23D5353200BB154C /* WRPDFHorizontalOutlineCell.swift in Sources */,
 				BBB98E8A23D1608A00C58427 /* WRPDFView.swift in Sources */,
+				BB39364023D6E56F0069DB36 /* WRPDFSearchHeaderView.swift in Sources */,
 				BB2A251523D4B9000084B200 /* WRPDFOutlinesViewController.swift in Sources */,
 				BBB98E9023D1A86500C58427 /* WRPDFPageViewController.swift in Sources */,
 				BBF9393523D3F13C0053080B /* WRPDFReaderConfig.swift in Sources */,

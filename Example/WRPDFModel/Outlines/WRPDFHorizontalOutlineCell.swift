@@ -57,4 +57,9 @@ class WRPDFHorizontalOutlineCell: UICollectionViewCell {
         self.titleLabel_leading?.constant = CGFloat(outline.level * 30)
         self.titleLabel.text = outline.title
     }
+    
+    func setConfig(_ value: (Int, String)) {
+        self.titleLabel.text = value.1
+
+    }
 }

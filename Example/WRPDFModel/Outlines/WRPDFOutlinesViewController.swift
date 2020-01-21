@@ -72,6 +72,7 @@ import WRPDFModel
     }
 }
 
+//MARK: -
 fileprivate typealias WRPDFOutlinesViewController_Action = WRPDFOutlinesViewController
 extension WRPDFOutlinesViewController_Action {
     @objc func action_close() {
@@ -80,6 +81,7 @@ extension WRPDFOutlinesViewController_Action {
 }
 
 
+//MARK: -
 fileprivate typealias WRPDFOutlinesViewController_CollectionView = WRPDFOutlinesViewController
 extension WRPDFOutlinesViewController_CollectionView : UICollectionViewDataSource, UICollectionViewDelegateFlowLayout{
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
