@@ -9,23 +9,31 @@ import UIKit
 
 //MARK:-
 public class WROutline: NSObject {
-    var title = ""
-    var page = 0
-    var subOutline = Array<WROutline>()
-    
+    public var title = ""
+    public var page = 0
+    public var subOutlines = Array<WROutline>()
+    public var isOpen = false
+    public var level: Int = -1
+
     public override init() {
         
     }
     
     public init(_ info: NSDictionary) {
+        super.init()
         self.title = info["Title"] as? String ?? ""
         self.page = info["Destination"] as? Int ?? 0
+        if let level = info["level"] as? Int, level > 0 {
+            self.level = info["level"] as? Int ?? 0
+        }
         if let subInfos = info["Children"] as? Array<NSDictionary> {
-            self.subOutline = subInfos.map({ (info) -> WROutline in
-                return WROutline.init(info)
+            self.subOutlines = subInfos.map({ [weak self] (info) -> WROutline in
+                let subOutline = WROutline.init(info)
+                subOutline.level = (self?.level ?? -1) + 1
+                return subOutline
             })
         }
-    }
+    }    
 }
 
 //MARK:-
@@ -36,13 +44,19 @@ class WRPDFNode {
     var name : String?
     var children = Array<WRPDFNode>()
     
-    
     fileprivate var privateOutlines: Array<WROutline>?
     var outlines: Array<WROutline> {
         get {
             if self.privateOutlines == nil {
                 if let outlineNode = self.child(for: "Outlines") {
-                    self.privateOutlines = self.outlines(from: outlineNode)
+                    let outlines = self.outlines(from: outlineNode).map { (info) -> NSDictionary in
+                        let mutableDic = NSMutableDictionary(dictionary: info)
+                        mutableDic["level"] = 1
+                        return mutableDic
+                    }
+                    self.privateOutlines = outlines.map({ (info) -> WROutline in
+                        return WROutline.init(info)
+                    })
                 }
             }
             return self.privateOutlines!
@@ -91,10 +105,12 @@ class WRPDFNode {
         case .string:
             var ptrObjectValue:UnsafePointer<Int8>? = nil
             _ = CGPDFObjectGetValue(object, type, &ptrObjectValue)
-            guard let value = ptrObjectValue else {
+            let stringValue = CGPDFStringCopyTextString(OpaquePointer(ptrObjectValue!))
+
+            guard ptrObjectValue != nil else {
                 return ""
             }
-            return String(cString: UnsafePointer<CChar>(value), encoding: .isoLatin1) ?? ""
+            return "\(stringValue!)"
             
         default:return ""
         }
@@ -176,19 +192,20 @@ class WRPDFNode {
         return pages
     }
     
-    fileprivate func outlines(from parentNode: WRPDFNode) -> [WROutline] {
+    fileprivate func outlines(from parentNode: WRPDFNode) ->  [[String : Any]] {
 
         parentNode.child()
         let firstNode = parentNode.child(for: "First")
         var outlineNode : WRPDFNode? = firstNode
         
-        var pageOutlines = [WROutline]()
+        var pageOutlines = [[String : Any]]()
+        
         while outlineNode != nil {
             outlineNode?.child()
             
-            let outline = WROutline()
+            var outline = [String : Any]()
             if let title = outlineNode?.child(for: "Title")?.value {
-                outline.title = title
+                outline["Title"] = title
             }
             
             let destNode = outlineNode?.child(for: "Dest")
@@ -198,7 +215,7 @@ class WRPDFNode {
 
                 if destNode!.type == .array, destNode?.children.count ?? 0 > 0 {
                     if let object = destNode?.children.first?.object {
-                        outline.page = self.index(self.pageNodes, object: object)
+                        outline["Destination"] = self.index(self.pageNodes, object: object)
                     }
                 } else if destNode!.type == .name {
                     if let subNode = destNode!.child(for: destNode!.value) {
@@ -206,7 +223,7 @@ class WRPDFNode {
                         if let grandsonNode = subNode.child(for: "D") {
                             grandsonNode.child()
                             if let object = grandsonNode.children.first?.object {
-                                outline.page = self.index(self.pageNodes, object: object)
+                                outline["Destination"] = self.index(self.pageNodes, object: object)
                             }
                         }
                     }
@@ -218,14 +235,14 @@ class WRPDFNode {
                         dNode.child()
                         if let d0Node = dNode.children.first {
                             if d0Node.type == .dictionary, let object = d0Node.object {
-                                outline.page = self.index(self.pageNodes, object: object)
+                                outline["Destination"] = self.index(self.pageNodes, object: object)
                             }
                         }
                     }
                 }
             }
                  
-            outline.subOutline = self.outlines(from: outlineNode!)
+            outline["Children"] = self.outlines(from: outlineNode!)
             pageOutlines.append(outline)
             outlineNode = outlineNode?.child(for: "Next")
         }

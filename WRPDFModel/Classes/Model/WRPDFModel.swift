@@ -13,21 +13,17 @@ public class WRPDFModel {
         self.url = url
         
         self.document = CGPDFDocument(self.url as CFURL)
-        
-//        let page = self.document?.page(at: 30)
-//        if let dic = page?.dictionary {
-//            parsePage(dic)
-//        }
+                
     }
         
     fileprivate var url : URL
     
-    fileprivate var pdfOutlines : [WROutline]?
     fileprivate var pdfPages : [CGPDFObjectRef]?
     
     fileprivate var infos : Dictionary<String, Any>?
     
     public var document : CGPDFDocument?
+    public var outlines : [WROutline] = [WROutline]()
 
 }
 
@@ -45,9 +41,9 @@ public extension WRPDFModel_Public {
     func getOutlines(_ completeBlock: @escaping ([WROutline]) -> ()) {
         let queue = DispatchQueue.global()
         queue.async {
-            if let pdfOutlines = self.pdfOutlines, pdfOutlines.count > 0 {
+            if self.outlines.count > 0 {
                 DispatchQueue.main.async {
-                    completeBlock(self.pdfOutlines!)
+                    completeBlock(self.outlines)
                 }
             }
             
@@ -58,8 +54,10 @@ public extension WRPDFModel_Public {
             if #available(iOS 11.0, *) {
                 if let outlineDic : NSDictionary = document.outline {
                     if let children = outlineDic["Children"] as? Array<NSDictionary> {
-                        self.pdfOutlines = children.map({ (info) -> WROutline in
-                            return WROutline.init(info)
+                        self.outlines = children.map({ (info) -> WROutline in
+                            let modifyInfo: NSMutableDictionary = NSMutableDictionary(dictionary: info)
+                            modifyInfo["level"] = 1
+                            return WROutline.init(modifyInfo)
                         })
                     } else {
                         completeBlock([])
@@ -74,19 +72,15 @@ public extension WRPDFModel_Public {
 
                 let rootNode = WRPDFNode(catalog: catalog)
                 rootNode.child()
-                self.pdfOutlines = rootNode.outlines
+                self.outlines = rootNode.outlines
+            
             }
             DispatchQueue.main.async {
-                completeBlock(self.pdfOutlines!)
+                completeBlock(self.outlines)
             }
         }
     }
     
-    var outlines : [WROutline] {
-        get {
-            return self.pdfOutlines ?? []
-        }
-    }
     var pages: [CGPDFObjectRef] {
         get {
             if self.pdfPages == nil {

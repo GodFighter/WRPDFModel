@@ -74,26 +74,20 @@ class ViewController: UIViewController {
         super.viewDidAppear(animated)
         
         WRPDFReaderConfig.shared.hasAnimated = false
-        WRPDFReaderConfig.shared.isDark = false
+        WRPDFReaderConfig.shared.isDark = true
+        
+        WRPDFReaderConfig.shared.backImage = UIImage(named: "navigationBar_Back")
 
         let url = Bundle.main.url(forResource: "投资的常识1", withExtension: "pdf")
         let pdfController = WRPDFViewController.init(url!)
-
-        let backBarButtonItem = UIBarButtonItem(image: UIImage(named: "navigationBar_Back"), style: .plain, target: self, action: #selector(action_back(_:)))
-        pdfController.pageViewController.navigationItem.leftBarButtonItems = [backBarButtonItem]
-        
-        
-        pdfController.modalPresentationStyle = .fullScreen
         self.present(pdfController, animated: true, completion: nil)
         
-        pdfController.setOutlinesItem(image: "navigationBar_Back")
+        pdfController.setOutlinesItem(image: UIImage(named: "navigationBar_Back"))
 
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//            WRPDFReaderConfig.shared.isDark = false
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//                WRPDFReaderConfig.shared.isDark = true
-//            }
-//        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            pdfController.setPageController(.vertical)
+            pdfController.setOutlinesItem(image: UIImage(named: "navigationBar_Back"))
+        }
         
 //        let pdfController = WRPDFPageViewController.init()
 //        pdfController.modalPresentationStyle = .fullScreen
