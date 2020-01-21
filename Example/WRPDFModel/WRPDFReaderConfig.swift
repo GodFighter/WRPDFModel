@@ -95,6 +95,11 @@ open class WRPDFReaderConfig: NSObject {
     /**搜索按钮标题*/
     @objc public var searchTitle: String?
 
+    /**菜单按钮图片*/
+    @objc public var menuImage: UIImage?
+    /**菜单按钮标题*/
+    @objc public var menuTitle: String?
+
     /**搜索结果数*/
     @objc public var searchResultTitle: String? = "搜索结果："
     /**搜索结果数*/

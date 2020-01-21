@@ -100,6 +100,14 @@ import WRPDFModel
 }
 
 //MARK: -
+fileprivate typealias WRPDFViewController_Action = WRPDFViewController
+public extension WRPDFViewController_Action{
+    @objc func action_edit(_ sender: UIBarButtonItem) {
+        
+    }
+}
+
+//MARK: -
 fileprivate typealias WRPDFViewController_Access = WRPDFViewController
 public extension WRPDFViewController_Access{
     @objc func access_outlinesController() {
@@ -223,6 +231,15 @@ private extension WRPDFViewController_Private {
         /*rightItems*/
         do {
             var rightItems = [UIBarButtonItem]()
+
+            var editItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(action_edit(_:)))
+            if let editTitle = WRPDFReaderConfig.shared.menuTitle  {
+                editItem = UIBarButtonItem.init(title: editTitle, style: .plain, target: self, action: #selector(action_edit(_:)))
+            } else if let editImage = WRPDFReaderConfig.shared.menuImage {
+                editItem = UIBarButtonItem(image: editImage, style: .plain, target: self, action: #selector(action_edit(_:)))
+            }
+            rightItems.append(editItem)
+
             if WRPDFReaderConfig.shared.showSearchItem {
                 var searchItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(access_searchController))
                 if let seachTitle = WRPDFReaderConfig.shared.searchTitle {
