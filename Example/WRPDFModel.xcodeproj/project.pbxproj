@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		5669247023D33F2F00106D02 /* WRPDFViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5669246F23D33F2F00106D02 /* WRPDFViewController.swift */; };
 		5669247323D3520A00106D02 /* WRPDFBackPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5669247223D3520A00106D02 /* WRPDFBackPageViewController.swift */; };
+		56F0445E23D717A70056807A /* WRPDFSearchFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56F0445D23D717A70056807A /* WRPDFSearchFooterView.swift */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
@@ -34,6 +35,7 @@
 		18D1008D0A6C1D128EBF0575 /* Pods-WRPDFModel_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WRPDFModel_Tests.release.xcconfig"; path = "Target Support Files/Pods-WRPDFModel_Tests/Pods-WRPDFModel_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		5669246F23D33F2F00106D02 /* WRPDFViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WRPDFViewController.swift; sourceTree = "<group>"; };
 		5669247223D3520A00106D02 /* WRPDFBackPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WRPDFBackPageViewController.swift; sourceTree = "<group>"; };
+		56F0445D23D717A70056807A /* WRPDFSearchFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WRPDFSearchFooterView.swift; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* WRPDFModel_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WRPDFModel_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -164,6 +166,7 @@
 			children = (
 				BB39363C23D6DCFD0069DB36 /* WRPDFSearchViewController.swift */,
 				BB39363F23D6E56F0069DB36 /* WRPDFSearchHeaderView.swift */,
+				56F0445D23D717A70056807A /* WRPDFSearchFooterView.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -304,6 +307,7 @@
 				BB39363D23D6DCFD0069DB36 /* WRPDFSearchViewController.swift in Sources */,
 				BB32DC7F23D5353200BB154C /* WRPDFHorizontalOutlineCell.swift in Sources */,
 				BBB98E8A23D1608A00C58427 /* WRPDFView.swift in Sources */,
+				56F0445E23D717A70056807A /* WRPDFSearchFooterView.swift in Sources */,
 				BB39364023D6E56F0069DB36 /* WRPDFSearchHeaderView.swift in Sources */,
 				BB2A251523D4B9000084B200 /* WRPDFOutlinesViewController.swift in Sources */,
 				BBB98E9023D1A86500C58427 /* WRPDFPageViewController.swift in Sources */,

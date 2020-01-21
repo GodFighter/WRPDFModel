@@ -87,7 +87,7 @@ public class SimpleDocumentIndexer {
 
         func string() -> String {
             return blocks.sorted(by:{ return $0.frame.origin.x < $1.frame.origin.x }).reduce("") { (res:String, block:TextBlock) -> String in
-                res.appending((res.endsWithCharInSet(set: .alphanumerics) && block.chars.beginsWithCharInSet(set: .alphanumerics) ? " " : "") + block.chars)
+                res.appending((res.endsWithCharInSet(set: .alphanumerics) && block.chars.beginsWithCharInSet(set: .alphanumerics) ? "" : "") + block.chars)
             }
         }
 

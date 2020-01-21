@@ -95,6 +95,13 @@ open class WRPDFReaderConfig: NSObject {
     /**搜索按钮标题*/
     @objc public var searchTitle: String?
 
+    /**搜索结果数*/
+    @objc public var searchResultTitle: String? = "搜索结果："
+    /**搜索结果数*/
+    @objc func searchResult(_ count: Int) -> String {
+        return (searchResultTitle ?? "")  + "\(count)"
+    }
+    
 
     internal var backgroundColor: UIColor {
         return WRPDFReaderConfig.shared.isDark ? WRPDFReaderConfig.shared.darkColor : WRPDFReaderConfig.shared.lightColor

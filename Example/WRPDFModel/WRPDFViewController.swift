@@ -120,6 +120,13 @@ public extension WRPDFViewController_Access{
         let searchController = WRPDFSearchViewController.init(self.pdf!)
         let navigationController = UINavigationController(rootViewController: searchController)
         self.present(navigationController, animated: true, completion: nil)
+        
+        searchController.selectedPageBlock = { [weak self] (page) in
+            if let startViewController = self?.viewControllerAt(page, isBack: false) {
+                let viewControllers = [startViewController]
+                self?.pageViewController.setViewControllers(viewControllers, direction: .forward, animated: false, completion: nil)
+            }
+        }
     }
 }
 

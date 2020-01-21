@@ -88,7 +88,8 @@ class ViewController: UIViewController {
             let pdfController = WRPDFViewController.init(url!)
             self.present(pdfController, animated: true, completion: nil)
             
-            pdfController.setOutlinesItem(image: UIImage(named: "navigationBar_Back"))
+//            pdfController.setOutlinesItem(image: UIImage(named: "navigationBar_Back"))
+            pdfController.setOutlinesItem()
 
 //            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
 //                pdfController.setPageController(.vertical)

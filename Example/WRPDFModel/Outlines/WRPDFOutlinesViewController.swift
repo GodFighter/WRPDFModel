@@ -57,6 +57,7 @@ import WRPDFModel
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.backgroundColor = WRPDFReaderConfig.shared.backgroundColor
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
         
         var safeAreaInsetsTop: CGFloat = 0
         if #available(iOS 11.0, *) {

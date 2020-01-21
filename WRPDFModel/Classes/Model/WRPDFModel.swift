@@ -14,8 +14,6 @@ public class WRPDFModel {
         self.url = url
         
         self.document = CGPDFDocument(self.url as CFURL)
-               
-
     }
         
     fileprivate var url : URL
@@ -27,7 +25,7 @@ public class WRPDFModel {
     public var outlines : [WROutline] = [WROutline]()
     
     deinit {
-        print("1234567")
+        debugPrint("WRPDFModel release")
     }
 }
 
@@ -135,18 +133,19 @@ public extension WRPDFModel_Public {
         return self.infos!
     }
     
-    func search(_ text: String, result block:@escaping ([(Int, String)], Bool) -> ()) {
+    func search(_ text: String, result block:@escaping (Int, [String], Bool) -> ()) {
         
+        self.stopSearch = false
         let totalPage = self.document?.numberOfPages ?? 0
 
         DispatchQueue.global().async { [weak self] in
             
             var currentPage = 0
 
-            while currentPage <= totalPage {
+            while currentPage < totalPage {
                 if self?.stopSearch ?? true {
                     DispatchQueue.main.async {
-                        block([], true)
+                        block(currentPage, [], true)
                     }
                     break
                 }
@@ -156,14 +155,14 @@ public extension WRPDFModel_Public {
 
                 let lineContents = strong_self.contentOf(page: currentPage)
                 
-                var results = [(Int, String)]()
+                var results = [String]()
                 lineContents.forEach { (lineContent) in
                     if lineContent.contains(text) {
-                        results.append((currentPage, lineContent))
+                        results.append(lineContent)
                     }
                 }
                 DispatchQueue.main.async {
-                    block(results, currentPage == totalPage)
+                    block(currentPage, results, currentPage == totalPage)
                 }
                 currentPage += 1
             }
