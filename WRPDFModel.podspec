@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'WRPDFModel'
-  s.version          = '0.0.1'
+  s.version          = '1.0.0'
   s.summary          = '解析并获取PDF模型.'
 
 # This description is used to generate tags and improve search results.
@@ -30,6 +30,39 @@ Pod::Spec.new do |s|
 
   s.source_files = 'WRPDFModel/Classes/*.swift'
   
+  s.subspec 'ContentParser' do |ss|
+      ss.source_files = 'WRPDFModel/Classes/ContentParser/*.swift'
+      ss.subspec 'result' do |ss|
+          ss.source_files = 'WRPDFModel/Classes/ContentParser/result/*.swift'
+      end
+
+      ss.subspec 'pdf' do |ss|
+          ss.source_files = 'WRPDFModel/Classes/ContentParser/pdf/*.swift'
+          
+          ss.subspec 'Container Types' do |sss|
+              sss.source_files = 'WRPDFModel/Classes/ContentParser/pdf/Container Types/*.swift'
+          end
+          
+          ss.subspec 'extensions' do |sss|
+              sss.source_files = 'WRPDFModel/Classes/ContentParser/pdf/extensions/*.swift'
+          end
+
+          ss.subspec 'fonts' do |sss|
+              sss.source_files = 'WRPDFModel/Classes/ContentParser/pdf/fonts/*.swift'
+              sss.subspec 'CompositeFonts' do |ssss|
+                  ssss.source_files = 'WRPDFModel/Classes/ContentParser/pdf/fonts/CompositeFonts/*.swift'
+              end
+
+              sss.subspec 'SimpleFonts' do |ssss|
+                  ssss.source_files = 'WRPDFModel/Classes/ContentParser/pdf/fonts/SimpleFonts/*.swift'
+                  ssss.subspec 'TrueTypeFontFile' do |sssss|
+                      sssss.source_files = 'WRPDFModel/Classes/ContentParser/pdf/fonts/SimpleFonts/TrueTypeFontFile/*.swift'
+                  end
+              end
+          end
+      end
+  end
+
   # s.resource_bundles = {
   #   'WRPDFModel' => ['WRPDFModel/Assets/*.png']
   # }
